@@ -6,6 +6,8 @@ resources:
   - bjw-s-charts.yaml
   - dysnix-charts.yaml
   - external-dns-charts.yaml
+  - gitea-charts.yaml
+  - grafana-charts.yaml
   - hajimari-charts.yaml
   - ingress-nginx-charts.yaml
   - jetstack-charts.yaml
@@ -13,4 +15,5 @@ resources:
   - k8s-gateway-charts.yaml
   - metallb-charts.yaml
   - metrics-server-charts.yaml
+  - prometheus-community-charts.yaml
   - stakater-charts.yaml

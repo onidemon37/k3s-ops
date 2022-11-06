@@ -45,7 +45,7 @@ spec:
                       key: api-key
                 selector:
                   dnsZones:
-                    - ${SECRET_DOMAIN}
+                    - ${SECRET_PUBLIC_DOMAIN}
 
       - apiVersion: cert-manager.io/v1
         kind: ClusterIssuer
@@ -66,4 +66,4 @@ spec:
                       key: api-key
                 selector:
                   dnsZones:
-                    - ${SECRET_DOMAIN}
+                    - ${SECRET_PUBLIC_DOMAIN}
