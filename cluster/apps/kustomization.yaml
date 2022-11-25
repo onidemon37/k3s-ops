@@ -6,7 +6,7 @@ resources:
   - flux-system
   - kube-system
   #- monitoring
-  - namespaces
+  - namespaces.yaml
   - networking
   - storage
   # - system-upgrade
