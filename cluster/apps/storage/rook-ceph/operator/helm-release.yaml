@@ -9,27 +9,29 @@ spec:
   chart:
     spec:
       chart: rook-ceph
-      version: v1.10.5
+      version: v1.10.6
       sourceRef:
         kind: HelmRepository
         name: rook-ceph-charts
         namespace: flux-system
   install:
-    createNamespace: true
-    remediation:
-      retries: 5
+    crds: CreateReplace
   upgrade:
-    remediation:
-      retries: 5
+    crds: CreateReplace
   values:
     crds:
       enabled: true
-    pspEnable: false
     monitoring:
       enabled: true
+    csi:
+      enableOMAPGenerator: true
+    # enablePluginSelinuxHostMount: true
+      nfs:
+        enabled: true
     resources:
       requests:
-        cpu: 10m
+        cpu: 350m
         memory: 128Mi
       limits:
-        memory: 256Mi
+        cpu: 1000m
+        memory: 356Mi

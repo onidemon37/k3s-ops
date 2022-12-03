@@ -25,53 +25,54 @@ spec:
     - name: rook-ceph-operator
       namespace: rook-ceph
   values:
+    toolbox:
+      enabled: true
+      image: quay.io/ceph/ceph:v17.2.5@sha256:0560b16bec6e84345f29fb6693cd2430884e6efff16a95d5bdd0bb06d7661c45
+      resources:
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
     monitoring:
       enabled: true
-      createPrometheusRules: true
-    ingress:
-      dashboard:
-        ingressClassName: "nginx"
-        host:
-          name: &host "rook.${SECRET_PUBLIC_DOMAIN}"
-          path: /
-        tls:
-          - hosts:
-              - *host
+      createPrometheusRules: false
+      prometheusRule:
+        labels: {}
+        annotations: {}
+
     cephClusterSpec:
+      resources:
+        osd:
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
       network:
         provider: host
-      crashCollector:
-        disable: false
       dashboard:
         enabled: true
         urlPrefix: /
-        ssl: false
-      storage:
-        useAllNodes: false
-        useAllDevices: false
-        config:
-          osdsPerDevice: "1"
-        nodes:
-          - name: k8s-2
-            devices:
-              - name: "/dev/vdb"
-    # cephBlockPoolsVolumeSnapshotClass:
-    #   enabled: true
-    #   name: csi-rbdplugin-snapclass
-    #   annotations:
-    #     velero.io/csi-volumesnapshot-class: "true"
+        ssl: true
+    cephBlockPoolsVolumeSnapshotClass:
+      enabled: false
     cephBlockPools:
       - name: ceph-blockpool
         spec:
           failureDomain: host
           replicated:
             size: 3
+          deviceClass: hdd
         storageClass:
           enabled: true
           name: ceph-block
           isDefault: true
           reclaimPolicy: Delete
           allowVolumeExpansion: true
+          mountOptions: []
           parameters:
             imageFormat: "2"
             imageFeatures: layering
@@ -82,7 +83,7 @@ spec:
             csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
             csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
             csi.storage.k8s.io/fstype: ext4
-    cephFileSystems:
+    ceph-filesystem:
       - name: ceph-filesystem
         spec:
           metadataPool:
@@ -93,15 +94,18 @@ spec:
               replicated:
                 size: 3
               name: data0
+              deviceClass: hdd
           metadataServer:
             activeCount: 1
             activeStandby: true
             resources:
-              requests:
-                cpu: 1000m
-                memory: 2Gi
               limits:
-                memory: 2Gi
+                cpu: "2000m"
+                memory: "4Gi"
+              requests:
+                cpu: "1000m"
+                memory: "4Gi"
+            priorityClassName: system-cluster-critical
         storageClass:
           enabled: true
           isDefault: false
@@ -109,6 +113,7 @@ spec:
           pool: data0
           reclaimPolicy: Delete
           allowVolumeExpansion: true
+          mountOptions: []
           parameters:
             csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
             csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
@@ -117,7 +122,46 @@ spec:
             csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
             csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
             csi.storage.k8s.io/fstype: ext4
+    cephObjectStores:
+      - name: ceph-objectstore
+        spec:
+          metadataPool:
+            failureDomain: host
+            replicated:
+              size: 3
+          dataPool:
+            failureDomain: host
+            deviceClass: ssd
+            erasureCoded:
+              dataChunks: 2
+              codingChunks: 1
+          preservePoolsOnDelete: true
+          gateway:
+            port: 80
+          resources:
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+            requests:
+              cpu: "1000m"
+              memory: "1Gi"
+            instances: 1
+            priorityClassName: system-cluster-critical
         storageClass:
           enabled: true
-          name: ceph-bucket
+          name: fast-ceph-bucket
           reclaimPolicy: Delete
+          parameters:
+            region: us-east-1
+    ingress:
+      dashboard:
+        ingressClassName: "nginx"
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+        host:
+          name: &host "rook.${SECRET_PUBLIC_DOMAIN}"
+          path: "/"
+        tls:
+          - secretName: rook-tls
+            hosts:
+              - "rook.${SECRET_PUBLIC_DOMAIN}"
