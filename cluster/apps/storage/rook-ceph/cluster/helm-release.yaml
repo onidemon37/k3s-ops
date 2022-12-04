@@ -57,6 +57,19 @@ spec:
         enabled: true
         urlPrefix: /
         ssl: true
+      storage:
+        useAllNodes: true
+        useAllDevices: false
+        config:
+          osdsPerDevice: "1"
+        nodes:
+          - name: "home-opsm1"
+            devices:
+              - name: "/dev/vdb"
+          - name: "home-opsw1"
+            devices:
+              - name: "/dev/vdb"
+          
     cephBlockPoolsVolumeSnapshotClass:
       enabled: false
     cephBlockPools:
