@@ -5,7 +5,7 @@ filelock==3.8.0
 identify==2.5.5
 nodeenv==1.7.0
 pathspec==0.10.1
-platformdirs==2.5.2
+platformdirs==2.5.4
 pre-commit==2.20.0
 PyYAML==6.0
 toml==0.10.2
