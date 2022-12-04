@@ -65,10 +65,10 @@ spec:
         nodes:
           - name: "home-opsm1"
             devices:
-              - name: "/dev/vdb"
+              - name: "vdb"
           - name: "home-opsw1"
             devices:
-              - name: "/dev/vdb"
+              - name: "vdb"
           
     cephBlockPoolsVolumeSnapshotClass:
       enabled: false
@@ -162,7 +162,7 @@ spec:
             priorityClassName: system-cluster-critical
         storageClass:
           enabled: true
-          name: fast-ceph-bucket
+          name: ceph-bucket
           reclaimPolicy: Delete
           parameters:
             region: us-east-1
