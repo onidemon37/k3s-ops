@@ -6,7 +6,7 @@ identify==2.5.11
 nodeenv==1.7.0
 pathspec==0.10.3
 platformdirs==2.6.0
-pre-commit==2.20.0
+pre-commit==2.21.0
 PyYAML==6.0
 toml==0.10.2
 virtualenv==20.17.1
